@@ -1,6 +1,8 @@
 import imgui
 
-from imgui_window import Window, save_image_to_cache, Texture, image_exist, get_image_path
+from imgui_window import Window, Texture
+from resource_load_interface import save_image_to_cache, image_exist
+from resource_load_utils import get_image_path
 from test_yt_music_data import get_test_data
 import requests
 
@@ -9,9 +11,10 @@ class YTMusicPlayList:
     def __init__(self, playlist):
         super(YTMusicPlayList, self).__init__()
         self.content = playlist
-        self.elements = []
+        self._elements = []
+
         for content in playlist['contents']:
-            self.elements.append(YTMusicPlayListElement(content))
+            self._elements.append(YTMusicPlayListElement(content))
 
     @property
     def title(self):
@@ -19,7 +22,7 @@ class YTMusicPlayList:
 
     @property
     def elements(self):
-        return self.elements
+        return self._elements
 
 
 class YTMusicPlayListElement:
@@ -63,11 +66,10 @@ class YTMusicPlaylistWindow(Window):
     def render_per_playlist(self, playlist):
         imgui.begin_child("Playlist", 0, 0, True)
 
-        imgui.text(playlist["title"])
+        imgui.text(playlist.title)
 
         for element in playlist.elements:
             imgui.text(element.title)
-            imgui.same_line()
             texture = element.thumbnail_texture
             imgui.image(texture.texture_id, texture.width, texture.height)
 

@@ -1,3 +1,5 @@
+from resource_load_interface import surface_to_texture_id
+
 class Texture(object):
     def __init__(self, path):
         super(Texture, self).__init__()

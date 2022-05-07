@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import platform
 import imgui
+
+from imgui_window import TestTextureWindow
 from yt_music_playlist import YTMusicPlaylistWindow
 
 is_x86 = platform.machine() in ("i386", "AMD64", "x86_64")
@@ -11,7 +13,7 @@ if is_x86:
         after_imgui_new_frame_sdl2, after_imgui_redner_sdl2, shutdown_sdl2
 else:
     from glfw_window import init_window_glfw, is_running_glfw, poll_event_glfw, pre_imgui_new_frame_glfw, \
-        after_imgui_new_frame_glfw, after_imgui_render_glfw, shutdown_glfw
+    after_imgui_new_frame_glfw, after_imgui_render_glfw, shutdown_glfw, surface_to_texture_id_glfw
 
 
 def init_window():
@@ -63,14 +65,19 @@ def shutdown():
         shutdown_glfw()
 
 
-windows = [YTMusicPlaylistWindow] 
+windows = []
+
 
 def draw_imgui_windows():
+
     imgui.show_test_window()
-	windows.render()
+    windows[0].render()
+
 
 def main():
     init_window()
+    # surface_to_texture_id_glfw("res/youtube-music7134.jpg")
+    windows.append(YTMusicPlaylistWindow())
 
     while is_running():
         poll_event()

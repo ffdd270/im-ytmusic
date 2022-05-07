@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from io import BytesIO
 
+from PIL import Image
 from sdl2 import *
 import sdl2.ext
 import sys
@@ -8,6 +10,8 @@ import OpenGL.GL as gl
 from imgui.integrations.sdl2 import SDL2Renderer
 import imgui
 from typing import Optional
+
+from resource_load_utils import save_image_to_cache_from_bytes
 
 RES: Optional[sdl2.ext.Resources] = None
 SDL2_EVENT: Optional[sdl2.SDL_Event] = None
@@ -73,7 +77,7 @@ def surface_to_texture_id_sdl2(path):
         if image.format.contents.Rmask == 0x000000ff:
             gl_format = gl.GL_RGBA
         else:
-            gl_format = gl.GL_BRGA
+            gl_format = gl.GL_BGRA
     elif image.format.contents.BytesPerPixel == 3:
         if image.format.contents.Rmask == 0x000000ff:
             gl_format = gl.GL_RGB
@@ -98,6 +102,12 @@ def surface_to_texture_id_sdl2(path):
 
     SDL_FreeSurface(image)
     return texture_id, width, height
+
+
+def save_image_to_cache_sdl2(url, contents):
+    image_name = save_image_to_cache_from_bytes(url, contents)
+    RES.scan("res")
+    return image_name
 
 
 def impl_pysdl2_init():
@@ -147,7 +157,3 @@ def impl_pysdl2_init():
         exit(1)
 
     return window, renderer, gl_context
-
-
-if __name__ == "__main__":
-    main()
