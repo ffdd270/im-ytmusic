@@ -4,96 +4,33 @@ import sdl2.ext
 import sys
 import ctypes
 import OpenGL.GL as gl
-
+from ytmusicapi.ytmusic import YTMusic
 import imgui
 from imgui.integrations.sdl2 import SDL2Renderer
 
+from imgui_window import init_res
 from main_menu import main_menu
+from test_yt_music_data import get_test_data
+from yt_music_playlist import YTMusicPlaylistWindow
 
 RES = None
 
-
-class Texture(object):
-    def __init__(self, path):
-        super(Texture, self).__init__()
-        self.path = path
-        # get texture_id, width, height by surface_to_texture_id function.
-        self._texture_id, self._width, self._height = surface_to_texture_id(path)
-
-    @property
-    def texture_id(self):
-        return self._texture_id
-
-    @texture_id.setter
-    def texture_id(self, value):
-        self._texture_id = value
-
-    @property
-    def width(self):
-        return self._width
-
-    @width.setter
-    def width(self, value):
-        self._width = value
-
-    @property
-    def height(self):
-        return self._height
-
-    @height.setter
-    def height(self, value):
-        self._height = value
-
-
-def draw_windows(texture):
+def draw_windows():
     main_menu()
 
     imgui.show_test_window()
 
     imgui.begin("Custom window", True)
     imgui.text("Bar")
-    imgui.image(texture.texture_id, texture.width, texture.height)
     imgui.text_colored("Eggs", 0.2, 1., 0.)
     imgui.end()
 
 
-def surface_to_texture_id(path):
-    global RES
 
-    image = sdl2.ext.load_image(RES.get_path(path))
-    texture_id = gl.glGenTextures(1)
-    gl.glBindTexture(gl.GL_TEXTURE_2D, texture_id)
-
-    format = gl.GL_RGBA
-    if image.format.contents.BytesPerPixel == 4:
-        if image.format.contents.Rmask == 0x000000ff:
-            format = gl.GL_RGBA
-        else:
-            format = gl.GL_BRGA
-    elif image.format.contents.BytesPerPixel == 3:
-        if image.format.contents.Rmask == 0x000000ff:
-            format = gl.GL_RGB
-        else:
-            format = gl.GL_BGR
-
-    if SDL_MUSTLOCK(image):
-        SDL_LockSurface(image)
-
-    array = ctypes.cast(image.pixels, ctypes.POINTER(ctypes.c_uint8))
-    width = image.w
-    height = image.h
-    gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, width, height, 0, format,
-                    gl.GL_UNSIGNED_BYTE, array)
-
-    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
-    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
-
-    # release the surface
-    if SDL_MUSTLOCK(image):
-        SDL_UnlockSurface(image)
-
-    SDL_FreeSurface(image)
-    return texture_id, width, height
+def test_yt_music():
+    yt_music = YTMusic("headers_auth.json")
+    result = yt_music.get_home(limit=6)
+    print(result)
 
 
 def main():
@@ -104,10 +41,11 @@ def main():
     running = True
     event = SDL_Event()
     # set global RES
-    global RES
-    RES = sdl2.ext.Resources(__file__, "res")
-    texture = Texture("youtube-music7134.jpg")
+    init_res()
 
+    imgui_windows = [YTMusicPlaylistWindow()]
+    # test_yt_music()
+    test_data = get_test_data()
     while running:
         while SDL_PollEvent(ctypes.byref(event)) != 0:
             if event.type == SDL_QUIT:
@@ -117,7 +55,11 @@ def main():
         impl.process_inputs()
         imgui.new_frame()
 
-        draw_windows(texture)
+        draw_windows()
+
+        for imgui_window in imgui_windows:
+            imgui_window.update()
+            imgui_window.render()
 
         gl.glClearColor(1., 1., 1., 1)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)

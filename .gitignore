@@ -1,3 +1,5 @@
 ﻿__pycache__
 imgui.ini
 .idea/misc.xml
+res/cache
+headers_auth.json
