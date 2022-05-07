@@ -1,3 +1,6 @@
 ﻿__pycache__
 imgui.ini
 .DS_Store
+.idea/misc.xml
+res/cache
+headers_auth.json

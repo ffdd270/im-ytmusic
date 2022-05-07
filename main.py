@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import platform
 import imgui
+from yt_music_playlist import YTMusicPlaylistWindow
 
 is_x86 = platform.machine() in ("i386", "AMD64", "x86_64")
 
@@ -62,9 +63,11 @@ def shutdown():
         shutdown_glfw()
 
 
+windows = [YTMusicPlaylistWindow] 
+
 def draw_imgui_windows():
     imgui.show_test_window()
-
+	windows.render()
 
 def main():
     init_window()
