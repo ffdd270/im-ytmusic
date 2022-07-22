@@ -2,7 +2,10 @@
 import platform
 import imgui
 
+
+from ytmusic_api import YTMusicAPI
 from imgui_window import TestTextureWindow
+from yt_music_test_window import YTMusicAPITestWindow
 from yt_music_playlist import YTMusicPlaylistWindow
 
 is_x86 = platform.machine() in ("i386", "AMD64", "x86_64")
@@ -72,12 +75,15 @@ def draw_imgui_windows():
 
     imgui.show_test_window()
     windows[0].render()
+    windows[1].render()
 
 
 def main():
+
     init_window()
     # surface_to_texture_id_glfw("res/youtube-music7134.jpg")
     windows.append(YTMusicPlaylistWindow())
+    windows.append(YTMusicAPITestWindow())
 
     while is_running():
         poll_event()
